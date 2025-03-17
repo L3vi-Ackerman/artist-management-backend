@@ -1,8 +1,6 @@
 from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
-    Group,
-    Permission,
 )
 from django.db import models
 from django.utils import choices, timezone
