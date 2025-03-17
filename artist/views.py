@@ -1,11 +1,10 @@
-from .pagination import ArtistPagination
-from .models import Artist
-from .serializers import ArtistSerializer
-
-from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.http import Http404
+from core.models import Artist
+from .serializers import ArtistSerializer
+from .pagination import ArtistPagination  # Ensure this is correctly imported
 
 
 class ArtistList(APIView):
@@ -17,7 +16,9 @@ class ArtistList(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer = ArtistSerializer(data=request.data)
+        serializer = ArtistSerializer(
+            data=request.data, context={"request": request}
+        )  # pass request object in context
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -38,11 +39,13 @@ class ArtistDetail(APIView):
 
     def put(self, request, pk, format=None):
         artist = self.get_object(pk)
-        serializer = ArtistSerializer(artist, data=request.data)
+        serializer = ArtistSerializer(
+            artist, data=request.data, context={"request": request}
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
         artist = self.get_object(pk)

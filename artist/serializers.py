@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Artist, CustomUser
+from core.models import Artist
 from users.serializers import UserSerializer
+from core.models import CustomUser
 
 
 class ArtistSerializer(serializers.Serializer):
-    user = UserSerializer()
+    user_id = serializers.IntegerField(write_only=True, required=False)
     dob = serializers.DateField()
     gender = serializers.ChoiceField(choices=Artist.GENDER, default="M")
     first_release_year = serializers.DateField()
@@ -14,18 +15,21 @@ class ArtistSerializer(serializers.Serializer):
     updated_at = serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):
-        user_data = validated_data.pop("user")
-        user = CustomUser.objects.create(**user_data)
+        user_id = validated_data.pop("user_id", None)
+        if user_id:
+            try:
+                user = CustomUser.objects.get(pk=user_id)
+            except CustomUser.DoesNotExist:
+                raise serializers.ValidationError(
+                    {"user_id": "User with this ID does not exist."}
+                )
+        else:
+            user = self.context["request"].user
+
         artist = Artist.objects.create(user=user, **validated_data)
         return artist
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop("user", None)
-
-        if user_data:
-            instance.user.email = user_data.get("email", instance.user.email)
-            instance.user.role = user_data.get("role", instance.user.role)
-            instance.user.save()
 
         instance.dob = validated_data.get("dob", instance.dob)
         instance.gender = validated_data.get("gender", instance.gender)
@@ -38,3 +42,8 @@ class ArtistSerializer(serializers.Serializer):
 
         instance.save()
         return instance
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["user"] = UserSerializer(instance.user).data
+        return representation
