@@ -4,7 +4,7 @@ from rest_framework import status
 from django.http import Http404
 from core.models import Artist
 from .serializers import ArtistSerializer
-from .pagination import ArtistPagination  # Ensure this is correctly imported
+from .pagination import ArtistPagination
 
 
 class ArtistList(APIView):
@@ -18,7 +18,7 @@ class ArtistList(APIView):
     def post(self, request, format=None):
         serializer = ArtistSerializer(
             data=request.data, context={"request": request}
-        )  # pass request object in context
+        )  #
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
