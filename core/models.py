@@ -1,4 +1,9 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    Group,
+    Permission,
+)
 from django.db import models
 from django.utils import choices, timezone
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +27,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
+    groups = models.ManyToManyField(
+        Group,
+        related_name="customuser_set",
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name="customuser_permissions",
+        blank=True,
+    )
 
     class Meta(AbstractBaseUser.Meta, PermissionsMixin.Meta):
         pass
