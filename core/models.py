@@ -27,16 +27,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
-    groups = models.ManyToManyField(
-        Group,
-        related_name="customuser_set",
-        blank=True,
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name="customuser_permissions",
-        blank=True,
-    )
 
     class Meta(AbstractBaseUser.Meta, PermissionsMixin.Meta):
         pass
