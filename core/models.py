@@ -18,6 +18,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_("email address"), unique=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
     role = models.CharField(max_length=20, choices=ROLES, default="ARTIST")
     date_joined = models.DateTimeField(default=timezone.now)
 
