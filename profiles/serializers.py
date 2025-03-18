@@ -22,6 +22,7 @@ class ProfileSerializer(serializers.Serializer):
                 )
         else:
             user = self.context["request"].user
+
         profile = Profile.objects.create(user=user, **validated_data)
         return profile
 
