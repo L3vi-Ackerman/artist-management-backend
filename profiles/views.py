@@ -5,7 +5,7 @@ from django.http import Http404
 from core.models import Profile
 from .serializers import ProfileSerializer
 from .selectors import getProfile, getAllProfiles
-from .services import createProfile, updateProfile
+from .services import createProfile, updateProfile, deleteProfile
 
 
 class ProfileList(APIView):
@@ -68,6 +68,11 @@ class ProfileDetail(APIView):
         return Response(updated_profile)
 
     def delete(self, request, pk, format=None):
-        profile = self.get_object(pk)
-        profile.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            deleteProfile(pk)
+            return Response(
+                {"message": "Profile deleted successfully!"},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -52,3 +52,8 @@ def updateProfile(pk, first_name, last_name, phone, dob, address):
             "dob": updated_profile[4],
             "address": updated_profile[5],
         }
+
+
+def deleteProfile(pk):
+    with connection.cursor() as cursor:
+        cursor.execute("DELETE FROM core_profile WHERE id = %s", [pk])
