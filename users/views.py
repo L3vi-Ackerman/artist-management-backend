@@ -1,12 +1,13 @@
 from django.contrib.auth.models import make_password
 from core.models import CustomUser
 from .serializers import LoginSerializer, UserSerializer, SignupSerializer
+from django.contrib.auth import authenticate
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .selectors import getAllUsers, getUser
-from .services import createUser, deleteUser
+from .services import createUser, deleteUser, updateUser, loginUser
 
 
 class UserList(APIView):
@@ -41,12 +42,22 @@ class UserDetail(APIView):
             )
 
     def put(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user_data = request.data
+        serializer = UserSerializer(data=user_data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        email = serializer.validated_data["email"]
+        password = serializer.validated_data["password"]
+        hashed_password = make_password(password)
+        role = serializer.validated_data["role"]
+        updated_user = updateUser(pk, email, hashed_password, role)
+
+        if not updated_user:
+            return Response(
+                {"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(updated_user)
 
     def delete(self, request, pk, format=None):
         try:
@@ -61,10 +72,14 @@ class UserDetail(APIView):
 
 class LoginView(APIView):
     def post(self, request, format=None):
-        serializer = LoginSerializer(data=request.data)
+        serializer = LoginSerializer(
+            data=request.data,
+            context={"request": request},
+        )
         if serializer.is_valid():
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SignupView(APIView):

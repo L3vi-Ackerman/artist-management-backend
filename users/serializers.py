@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from core.models import CustomUser, Artist
 from django.contrib.auth import authenticate
+
+from .services import loginUser
 from .utils import create_jwt
+from django.contrib.auth.hashers import make_password
 
 
 class UserSerializer(serializers.Serializer):
@@ -41,13 +44,13 @@ class LoginSerializer(serializers.Serializer):
 
         if not email or not password:
             raise serializers.ValidationError("Both email and password are required")
-        user = authenticate(email=email, password=password)
+        user = loginUser(email, password)
 
         if user is None:
-            raise serializers.ValidationError("Invalid Credentials!")
-
+            raise serializers.ValidationError("Invalid credentials!")
         token = create_jwt(user)
-        return token
+
+        return {"token": token}
 
 
 class SignupSerializer(serializers.Serializer):
