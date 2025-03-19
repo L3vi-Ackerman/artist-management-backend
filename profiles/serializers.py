@@ -4,7 +4,8 @@ from core.models import CustomUser, Profile
 
 
 class ProfileSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField(write_only=True, required=False)
+    id = serializers.IntegerField(read_only=True)
+    user_id = serializers.IntegerField(required=False)
     first_name = serializers.CharField(required=True, max_length=255)
     last_name = serializers.CharField(required=True, max_length=255)
     phone = serializers.IntegerField()
@@ -36,7 +37,7 @@ class ProfileSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        user_data = UserSerializer(instance.user).data
-        return {"user": user_data, **representation}
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     user_data = UserSerializer(instance.user).data
+    #     return {"user": user_data, **representation}
