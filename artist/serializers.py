@@ -45,5 +45,5 @@ class ArtistSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["user"] = UserSerializer(instance.user).data
-        return representation
+        user_data = UserSerializer(instance.user).data
+        return {"user": user_data, **representation}
