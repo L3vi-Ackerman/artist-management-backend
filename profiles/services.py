@@ -30,3 +30,25 @@ def createProfile(userId, first_name, last_name, phone, dob, address):
         "dob": dob,
         "address": address,
     }
+
+
+def updateProfile(pk, first_name, last_name, phone, dob, address):
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "UPDATE core_artist SET first_name = %s, last_name = %s, phone = %s, dob = %s, address = %s WHERE id = %s RETURNING id, dob, gender, first_release_year,no_of_albumns_released",
+            [first_name, last_name, phone, dob, address, pk],
+        )
+
+        updated_profile = cursor.fetchone()
+        print(updated_profile)
+        if not updated_profile:
+            return None
+        return {
+            "id": updated_profile[0],
+            "first_name": updated_profile[1],
+            "last_name": updated_profile[2],
+            "phone": updated_profile[3],
+            "dob": updated_profile[4],
+            "address": updated_profile[5],
+        }

@@ -64,7 +64,7 @@ class ArtistDetail(APIView):
 
         if not udpated_artist:
             return Response(
-                {"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND
+                {"detail": "Artist not found"}, status=status.HTTP_404_NOT_FOUND
             )
 
         return Response(udpated_artist)

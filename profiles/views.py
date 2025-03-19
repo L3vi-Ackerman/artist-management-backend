@@ -5,7 +5,7 @@ from django.http import Http404
 from core.models import Profile
 from .serializers import ProfileSerializer
 from .selectors import getProfile, getAllProfiles
-from .services import createProfile
+from .services import createProfile, updateProfile
 
 
 class ProfileList(APIView):
@@ -43,12 +43,29 @@ class ProfileDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-        profile = self.get_object(pk)
-        serializer = ProfileSerializer(profile, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        profile = request.data
+        serializer = ProfileSerializer(profile)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        first_name = serializer.validated_data["first_name"]
+        last_name = serializer.validated_data["last_name"]
+        phone = serializer.validated_data["phone"]
+        dob = serializer.validated_data["dob"]
+        address = serializer.validated_data["address"]
+        updated_profile = updateProfile(
+            pk,
+            first_name=first_name,
+            last_name=last_name,
+            phone=phone,
+            dob=dob,
+            address=address,
+        )
+
+        if not updated_profile:
+            return Response(
+                {"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(updated_profile)
 
     def delete(self, request, pk, format=None):
         profile = self.get_object(pk)
