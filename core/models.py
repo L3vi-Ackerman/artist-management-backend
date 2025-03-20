@@ -66,14 +66,11 @@ class Music(models.Model):
         ("r", "rock"),
         ("j", "jazz"),
     )
-    artist_id = models.ManyToManyField(Artist, through="ArtistMusic")
+    artist_id = models.OneToOneField(
+        Artist, on_delete=models.CASCADE, related_name="music", null=True, blank=True
+    )
     title = models.CharField(max_length=255)
     albumn_name = models.CharField(max_length=255)
     genre = models.CharField(max_length=7)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True, null=True)
-
-
-class ArtistMusic(models.Model):
-    artist_id = models.ForeignKey(Artist, on_delete=models.CASCADE)
-    music_id = models.ForeignKey(Music, on_delete=models.CASCADE)
