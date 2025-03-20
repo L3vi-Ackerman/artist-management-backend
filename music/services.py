@@ -1,45 +1,62 @@
 from django.db import connection
-from django.contrib.auth.hashers import make_password
 from django.utils import timezone
-from django.contrib.auth.hashers import check_password
 
 
-def createMusic(artist_id, title, albumn_name, genre):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "INSERT INTO core_music (artist_id, title, albumn_name, genre) VALUES (%s %s, %s, %s, %s) RETURNING ID",
-            (artist_id, title, albumn_name, genre),
-        )
-        newMusic = cursor.fetchone()
-        print(f"newMusicInstance: ", newMusic)
+def createMusic(artist_id, title, album_name, genre):
 
-    return {
-        "id": newMusic[0],
-        "artist_id": artist_id,
-        "title": title,
-        "albumn_name": albumn_name,
-        "genre": genre,
-    }
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO core_music (artist_id, title, albumn_name, genre, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;",
+                [artist_id, title, album_name, genre, timezone.now(), timezone.now()],
+            )
+
+            music_id = cursor.fetchone()[0]
+            print(music_id)
+            return {
+                "id": music_id,
+                "artist_id": artist_id,
+                "title": title,
+                "album_name": album_name,
+                "genre": genre,
+                "created_at": timezone.now(),
+                "updated_at": timezone.now(),
+            }
+
+    except Exception as e:
+        print(f"Error creating music: {e}")
+        return None
 
 
-def updateMusic(pk, title, albumn_name, genre):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "UPDATE core_music SET title = %s, albumn_name=%s, genre=%s WHERE id = %s RETURNING id,title, albumn_name,genre",
-            [title, albumn_name, genre, pk],
-        )
-        updated_music = cursor.fetchone()
-        print(updated_music)
-        if not updated_music:
+def updateMusic(pk, title, album_name, genre):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE core_music
+                SET title = %s, albumn_name = %s, genre = %s, updated_at = %s
+                WHERE id = %s
+                RETURNING id, artist_id, title, albumn_name, genre, created_at, updated_at;
+                """,
+                [title, album_name, genre, timezone.now(), pk],
+            )
+            updated_music = cursor.fetchone()
+            if updated_music:
+                columns = [col[0] for col in cursor.description]
+                return dict(zip(columns, updated_music))
             return None
-        return {
-            "id": updated_music[0],
-            "title": updated_music[1],
-            "albumn_name": updated_music[2],
-            "genre": updated_music[3],
-        }
+
+    except Exception as e:
+        print(f"Error updating music: {e}")
+        return None
 
 
 def deleteMusic(pk):
-    with connection.cursor() as cursor:
-        cursor.execute("DELETE FROM core_music WHERE id = %s", [pk])
+    """Deletes a Music record using a raw SQL query."""
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM core_music WHERE id = %s;", [pk])
+            return True
+    except Exception as e:
+        print(f"Error deleting music: {e}")
+        return False

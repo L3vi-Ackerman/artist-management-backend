@@ -1,19 +1,22 @@
-from django.shortcuts import render
-
-from core.models import Music
-from .serializers import MusicSerializer
-from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .selectors import getMusic, getAllMusic
-from .services import createMusic, updateMusic, deleteMusic
+from django.http import Http404
+from core.models import Music, Artist
+from .serializers import MusicSerializer
+from .services import (
+    createMusic,
+    updateMusic,
+    deleteMusic,
+)
+from .selectors import getAllMusic, getMusic
 
 
 class MusicList(APIView):
     def get(self, request, format=None):
         music = getAllMusic()
-        serializer = MusicSerializer(music, many=True)
+        serializer = MusicSerializer(data=music, many=True)
+        serializer.is_valid()
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -21,9 +24,9 @@ class MusicList(APIView):
         serializer.is_valid(raise_exception=True)
         music_data = serializer.validated_data
         music = createMusic(
-            music_data["artist_id"],
+            music_data["artist_id"].id,
             music_data["title"],
-            music_data["albumn_name"],
+            music_data["album_name"],
             music_data["genre"],
         )
         return Response(music, status=status.HTTP_201_CREATED)
@@ -43,21 +46,22 @@ class MusicDetail(APIView):
 
     def put(self, request, pk, format=None):
         music = self.get_object(pk)
-        serializer = MusicSerializer(music, data=request.data)
+        serializer = MusicSerializer(music, data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        author_id = serializer.validated_data["author_id"]
-        title = serializer.validated_data["title"]
-        albumn_name = serializer.validated_data["albumn_name"]
-        genre = serializer.validated_data["genre"]
-        updated_music = updateMusic(
-            pk, author_id=author_id, title=title, albumn_name=albumn_name, genre=genre
-        )
+        music_data = serializer.validated_data
+        title = music_data.get("title", music.get("title"))
+        album_name = music_data.get("album_name", music.get("album_name"))
+        genre = music_data.get("genre", music.get("genre"))
+
+        updated_music = updateMusic(pk, title=title, album_name=album_name, genre=genre)
         if not updated_music:
             return Response(
                 {"detail": "Music not found"}, status=status.HTTP_404_NOT_FOUND
             )
-        return Response(updated_music)
+        serializer = MusicSerializer(data=updated_music)
+        serializer.is_valid()
+        return Response(serializer.data)
 
     def delete(self, request, pk, format=None):
         try:
