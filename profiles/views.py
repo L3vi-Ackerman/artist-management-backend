@@ -76,3 +76,4 @@ class ProfileDetail(APIView):
             )
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

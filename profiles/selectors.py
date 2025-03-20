@@ -5,9 +5,9 @@ def getAllProfiles():
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM core_profile")
         columns = [col[0] for col in cursor.description]
-        users = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        print(users)
-    return users
+        profile = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        print(profile)
+    return profile
 
 
 def getProfile(pk: int):

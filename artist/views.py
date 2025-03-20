@@ -28,8 +28,10 @@ class ArtistList(APIView):
         artist_data = serializer.validated_data
         artist = createArtist(
             artist_data["user_id"],
+            artist_data["name"],
             artist_data["dob"],
             artist_data["gender"],
+            artist_data["address"],
             artist_data["first_release_year"],
             artist_data["no_of_albumns_released"],
         )
@@ -53,13 +55,22 @@ class ArtistDetail(APIView):
         serializer = ArtistSerializer(data=user_data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        name = serializer.validated_data["name"]
         dob = serializer.validated_data["dob"]
         gender = serializer.validated_data["gender"]
+        address = serializer.validated_data["address"]
         first_release_year = serializer.validated_data["first_release_year"]
+        address = serializer.validated_data["address"]
         no_of_albumns_released = serializer.validated_data["no_of_albumns_released"]
+
         udpated_artist = updateArtist(
-            pk, dob, gender, first_release_year, no_of_albumns_released
+            pk,
+            name,
+            dob,
+            gender,
+            address,
+            first_release_year,
+            no_of_albumns_released,
         )
 
         if not udpated_artist:
