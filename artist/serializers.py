@@ -8,8 +8,11 @@ class ArtistSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     user_id = serializers.IntegerField(required=False)
     user_email = serializers.EmailField(read_only=True)
+    name = serializers.CharField(max_length=255)
     dob = serializers.DateField()
     gender = serializers.ChoiceField(choices=Artist.GENDER, default="M")
+    address = serializers.CharField(max_length=255)
+
     first_release_year = serializers.DateField()
     no_of_albumns_released = serializers.IntegerField()
     created_at = serializers.DateTimeField(default=timezone.now, read_only=True)
@@ -31,8 +34,10 @@ class ArtistSerializer(serializers.Serializer):
         return artist
 
     def update(self, instance, validated_data):
+        instance.name = validated_data.get("name", instance.name)
         instance.dob = validated_data.get("dob", instance.dob)
         instance.gender = validated_data.get("gender", instance.gender)
+        instance.address = validated_data.get("address", instance.address)
         instance.first_release_year = validated_data.get(
             "first_release_year", instance.first_release_year
         )
@@ -41,17 +46,3 @@ class ArtistSerializer(serializers.Serializer):
         )
         instance.save()
         return instance
-
-    # def to_representation(self, instance):
-    #     print(type(instance))
-    #     representation = super().to_representation(instance)
-    #     user_id = representation.get("user_id")
-    #     if user_id:
-    #         user = getUser(pk=user_id)
-    #         if user:
-    #             representation["user_email"] = user.get("email")  # get email from dict.
-    #         else:
-    #             representation["user_email"] = None
-
-    #     representation["artist_id"] = instance.id
-    #     return representation

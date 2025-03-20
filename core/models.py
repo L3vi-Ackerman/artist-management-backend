@@ -47,9 +47,11 @@ class Profile(models.Model):
 
 class Artist(models.Model):
     GENDER = (("M", "Male"), ("F", "Female"), ("O", "Other"))
+    name = models.CharField(max_length=255)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     dob = models.DateField()
     gender = models.CharField(max_length=1, default="M", choices=GENDER)
+    address = models.CharField(max_length=255)
     first_release_year = models.DateField()
     no_of_albumns_released = models.IntegerField()
     created_at = models.DateTimeField(default=timezone.now)
