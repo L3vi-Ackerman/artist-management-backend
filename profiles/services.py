@@ -32,12 +32,12 @@ def createProfile(userId, first_name, last_name, phone, dob, address):
     }
 
 
-def updateProfile(pk, first_name, last_name, phone, dob, address):
+def updateProfile(pk, user_id, first_name, last_name, phone, dob, address):
 
     with connection.cursor() as cursor:
         cursor.execute(
-            "UPDATE core_artist SET first_name = %s, last_name = %s, phone = %s, dob = %s, address = %s WHERE id = %s RETURNING id, dob, gender, first_release_year,no_of_albumns_released",
-            [first_name, last_name, phone, dob, address, pk],
+            "UPDATE core_artist SET first_name = %s, last_name = %s, phone = %s, dob = %s, address = %s WHERE id = %s AND user_id = %s RETURNING id, dob, gender, first_release_year,no_of_albumns_released",
+            [first_name, last_name, phone, dob, address, pk, user_id],
         )
 
         updated_profile = cursor.fetchone()

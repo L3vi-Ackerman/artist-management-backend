@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 from core.models import Profile
+from users.utils import decode_jwt
 from .serializers import ProfileSerializer
 from .selectors import getProfile, getAllProfiles
 from .services import createProfile, updateProfile, deleteProfile
@@ -15,6 +16,9 @@ class ProfileList(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        token = request.headers["Authorization"].split(" ")[1]
+        user_id = token.get("id")
+        role = token.get("role")
 
         serializer = ProfileSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -42,30 +46,36 @@ class ProfileDetail(APIView):
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        profile = request.data
-        serializer = ProfileSerializer(profile)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        first_name = serializer.validated_data["first_name"]
-        last_name = serializer.validated_data["last_name"]
-        phone = serializer.validated_data["phone"]
-        dob = serializer.validated_data["dob"]
-        address = serializer.validated_data["address"]
-        updated_profile = updateProfile(
-            pk,
-            first_name=first_name,
-            last_name=last_name,
-            phone=phone,
-            dob=dob,
-            address=address,
-        )
+    # def put(self, request, pk, format=None):
+    #     profile = request.data
+    #     token = request.headers["Authorization"].split(" ")[1]
+    #     payload = decode_jwt(token)
+    #     user_id = payload.get("id")
+    #     # if role === 'super_admin' or
+    #     # # updated_profile()
+    #     serializer = ProfileSerializer(profile)
+    #     if not serializer.is_valid():
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #     first_name = serializer.validated_data["first_name"]
+    #     last_name = serializer.validated_data["last_name"]
+    #     phone = serializer.validated_data["phone"]
+    #     dob = serializer.validated_data["dob"]
+    #     address = serializer.validated_data["address"]
+    #     updated_profile = updateProfile(
+    #         pk,
+    #         user_id
+    #         first_name=first_name,
+    #         last_name=last_name,
+    #         phone=phone,
+    #         dob=dob,
+    #         address=address,
+    #     )
 
-        if not updated_profile:
-            return Response(
-                {"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-        return Response(updated_profile)
+    #     if not updated_profile:
+    #         return Response(
+    #             {"detail": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
+    #         )
+    #     return Response(updated_profile)
 
     def delete(self, request, pk, format=None):
         try:
@@ -76,4 +86,3 @@ class ProfileDetail(APIView):
             )
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

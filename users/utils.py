@@ -1,6 +1,7 @@
 import jwt
 import datetime
 from django.conf import settings
+from rest_framework.authentication import BaseAuthentication
 
 SECRET_KEY = settings.SECRET_KEY
 

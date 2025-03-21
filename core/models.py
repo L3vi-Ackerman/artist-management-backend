@@ -47,6 +47,10 @@ class Profile(models.Model):
 
 class Artist(models.Model):
     GENDER = (("M", "Male"), ("F", "Female"), ("O", "Other"))
+
+    manager = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, null=True, blank=True
+    )
     name = models.CharField(max_length=255)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     dob = models.DateField()
@@ -70,7 +74,7 @@ class Music(models.Model):
         Artist, on_delete=models.CASCADE, db_column="artist_id"
     )
     title = models.CharField(max_length=255)
-    albumn_name = models.CharField(max_length=255)
+    album_name = models.CharField(max_length=255)
     genre = models.CharField(max_length=7)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True, null=True)
