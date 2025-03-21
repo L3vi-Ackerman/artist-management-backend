@@ -5,16 +5,36 @@ from core.models import Artist
 
 def get_paginated_artists(request, paginator):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM core_artist")
+        cursor.execute(
+            """
+         SELECT      
+         core_customuser.id,        
+         core_customuser.email,
+         core_customuser.role,
+         core_artist.name,
+         core_artist.dob,
+         core_artist.gender,
+         core_artist.address,
+         core_artist.first_release_year,
+         core_artist.no_of_albumns_released,
+         core_artist.created_at,
+         core_artist.updated_at
+         FROM core_artist JOIN core_customuser 
+         ON core_artist.user_id = core_customuser.id
+        """
+        )
         columns = [col[0] for col in cursor.description]
         artists_dicts = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        print("Artist Id: ", artists_dicts[0]["id"])
+        print(cursor.fetchall())
 
-    artist_instances = []
-    for artist_dict in artists_dicts:
-        artist_instance = Artist(
-            id=artist_dict["id"],
-            user_id=artist_dict["user_id"],
+    if not artists_dicts:
+        return paginator.get_paginated_response([])
+
+    artist_instances = [
+        Artist(
+            user_id=artist_dict["id"],
+            email=artist_dict["email"],
+            role=artist_dict["role"],
             name=artist_dict["name"],
             dob=artist_dict["dob"],
             gender=artist_dict["gender"],
@@ -24,9 +44,10 @@ def get_paginated_artists(request, paginator):
             created_at=artist_dict["created_at"],
             updated_at=artist_dict["updated_at"],
         )
-        print(repr(artist_instance))
-        artist_instances.append(artist_instance)
+        for artist_dict in artists_dicts
+    ]
 
+    # Returning the paginated response
     return paginator.paginate_queryset(artist_instances, request)
 
 

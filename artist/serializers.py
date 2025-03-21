@@ -5,9 +5,10 @@ from users.selectors import getUser
 
 
 class ArtistSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    user_id = serializers.IntegerField(required=False)
-    user_email = serializers.EmailField(read_only=True)
+    # id = serializers.IntegerField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+    email = serializers.EmailField(read_only=True)
+    role = serializers.CharField(read_only=True)
     name = serializers.CharField(max_length=255)
     dob = serializers.DateField()
     gender = serializers.ChoiceField(choices=Artist.GENDER, default="M")
