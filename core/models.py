@@ -66,8 +66,8 @@ class Music(models.Model):
         ("r", "rock"),
         ("j", "jazz"),
     )
-    artist_id = models.OneToOneField(
-        Artist, on_delete=models.CASCADE, related_name="music", null=True, blank=True
+    artist_id = models.ForeignKey(
+        Artist, on_delete=models.CASCADE, db_column="artist_id"
     )
     title = models.CharField(max_length=255)
     albumn_name = models.CharField(max_length=255)

@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
     "artist",
     "music",
@@ -33,8 +34,10 @@ INSTALLED_APPS = [
     "core",
 ]
 AUTH_USER_MODEL = "core.CustomUser"
-
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

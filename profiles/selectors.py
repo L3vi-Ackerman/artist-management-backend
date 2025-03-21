@@ -3,7 +3,7 @@ from django.db import connection
 
 def getAllProfiles():
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM core_profile")
+        cursor.execute("SELECT * FROM core_profile ")
         columns = [col[0] for col in cursor.description]
         profile = [dict(zip(columns, row)) for row in cursor.fetchall()]
         print(profile)
