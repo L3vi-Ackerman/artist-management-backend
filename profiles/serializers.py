@@ -4,7 +4,8 @@ from core.models import CustomUser, Profile
 
 
 class ProfileSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
+    email = serializers.EmailField(read_only=True)
+    role = serializers.CharField(read_only=True)
     user_id = serializers.IntegerField(required=False)
     first_name = serializers.CharField(required=True, max_length=255)
     last_name = serializers.CharField(required=True, max_length=255)
