@@ -10,7 +10,6 @@ def getAllUsers():
 
 
 def getUser(pk: int):
-    print("Primary Key: ", pk)
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM core_customuser WHERE id = %s", (pk,))
         columns = [col[0] for col in cursor.description]

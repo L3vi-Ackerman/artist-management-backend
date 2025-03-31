@@ -8,9 +8,9 @@ SECRET_KEY = settings.SECRET_KEY
 
 def create_jwt(user):
     accessPayload = {
-        "id": user["id"],
-        "email": user["email"],
-        "role": user["role"],
+        "id": user["id"],  # Access id from the dict
+        "email": user["email"], # Access email from the dict
+        "role": user["role"], # Access role from the dict
         "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=15),
         "iat": datetime.datetime.utcnow(),
     }
@@ -18,10 +18,10 @@ def create_jwt(user):
     accessToken = jwt.encode(accessPayload, SECRET_KEY, algorithm="HS256")
 
     refreshPayload = {
-        "id": user["id"],
-        "email": user["email"],
-        "role": user["role"],
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=15),
+        "id": user["id"], # Access id from the dict
+        "email": user["email"], # Access email from the dict
+        "role": user["role"], # Access role from the dict
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=7), # increased refresh token expiration.
         "iat": datetime.datetime.utcnow(),
     }
 

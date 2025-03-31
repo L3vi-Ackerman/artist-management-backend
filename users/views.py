@@ -1,6 +1,6 @@
 from django.contrib.auth.models import make_password
 from core.models import CustomUser
-from .serializers import LoginSerializer, UserSerializer, SignupSerializer
+from .serializers import LoginSerializer, UserSerializer, ArtistSignupSerializer
 from django.contrib.auth import authenticate
 from django.http import Http404
 from rest_framework.views import APIView
@@ -77,7 +77,23 @@ class LoginView(APIView):
             context={"request": request},
         )
         if serializer.is_valid():
-            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+            data = serializer.validated_data
+            response = Response(data, status=status.HTTP_200_OK)
+
+            response.set_cookie(
+                "accessToken",
+                data["token"]["accessToken"],
+                samesite="lax",
+                httponly=True,
+            )
+            response.set_cookie(
+                "refreshToken",
+                data["token"]["refreshToken"],
+                samesite="lax",
+                httponly=True,
+            )
+            return response
+
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
