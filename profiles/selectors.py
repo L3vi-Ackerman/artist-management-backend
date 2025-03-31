@@ -1,48 +1,29 @@
 from django.db import connection
-
+from core.models import Profile
 
 def getAllProfiles():
+    
     with connection.cursor() as cursor:
-        cursor.execute(
-            """SELECT core_customuser.email, 
-            core_customuser.role, 
-            core_profile.first_name, 
-            core_profile.last_name, 
-            core_profile.phone, 
-            core_profile.dob, 
-            core_profile.address, 
-            core_profile.created_at 
-            FROM core_profile JOIN core_customuser ON 
-            core_profile.user_id = core_customuser.id"""
-        )
+        cursor.execute("SELECT * FROM core_profile")
         columns = [col[0] for col in cursor.description]
-        profile = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        print(profile)
-    return profile
+        profiles_data = cursor.fetchall()
+
+        profiles = []
+        for row in profiles_data:
+            profile_dict = dict(zip(columns, row))
+            profile = Profile(**profile_dict)
+            profiles.append(profile)
+
+        return profiles
 
 
 def getProfile(pk: int):
-    print("Primary Key: ", pk)
+    print(pk)
     with connection.cursor() as cursor:
-        cursor.execute(
-            """SELECT 
-    core_customuser.email, 
-    core_customuser.role, 
-    core_profile.first_name, 
-    core_profile.last_name, 
-    core_profile.phone, 
-    core_profile.dob, 
-    core_profile.address, 
-    core_profile.created_at 
-FROM core_profile 
-JOIN core_customuser ON core_profile.user_id = core_customuser.id 
-WHERE core_profile.id = %s
-""",
-            (pk,),
-        )
+        cursor.execute("SELECT * FROM core_profile WHERE id = %s", (pk,))
         columns = [col[0] for col in cursor.description]
         row = cursor.fetchone()
-
+        print(row)
         if row:
             return dict(zip(columns, row))
         return None

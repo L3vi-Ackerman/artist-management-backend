@@ -13,8 +13,21 @@ if not SECRET_KEY:
     raise ValueError("SECRET_KEY is not set in the .env file")
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+CORS_ALLOWED_CREDENTIALS = True
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 # Application definition
 
@@ -34,10 +47,19 @@ INSTALLED_APPS = [
     "core",
 ]
 AUTH_USER_MODEL = "core.CustomUser"
-CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+
+
+CORS_ALLOWED_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "OPTIONS",
+]
+
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -67,7 +89,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "artistsystem.wsgi.application"
 
-
+REST_FRAMEWORK = {
+        "DEFAULT_AUTHENTICATION_CLASSES": ("users.authentication.JWTAuthentication",),
+        "DEFAULT_PERMISSION_CLASSES":("rest_framework.permissions.IsAuthenticated",),
+        }
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 

@@ -8,7 +8,6 @@ def get_paginated_artists(request, paginator):
         cursor.execute("SELECT * FROM core_artist")
         columns = [col[0] for col in cursor.description]
         artists_dicts = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        print("Artist Id: ", artists_dicts[0]["id"])
 
     artist_instances = []
     for artist_dict in artists_dicts:
