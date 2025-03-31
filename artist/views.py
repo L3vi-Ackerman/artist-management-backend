@@ -8,8 +8,10 @@ from .pagination import ArtistPagination
 from .selectors import get_paginated_artists, getArtist
 from .services import createArtist, updateArtist, deleteArtist
 from users.services import createUser
+from rest_framework.permissions import IsAuthenticated
 
 class ArtistList(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request, format=None):
         try:
             paginator = ArtistPagination()
