@@ -8,6 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+JWT_SECRET_KEY = os.getenv("SECRET_KEY")
+JWT_ALGORITHM = 'HS256'
 
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY is not set in the .env file")
@@ -90,9 +92,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "artistsystem.wsgi.application"
 
 REST_FRAMEWORK = {
-        "DEFAULT_AUTHENTICATION_CLASSES": ("users.authentication.JWTAuthentication",),
-        "DEFAULT_PERMISSION_CLASSES":("rest_framework.permissions.IsAuthenticated",),
-        }
+    "DEFAULT_AUTHENTICATION_CLASSES": ("users.authentication.JWTAuthentication",),
+    # "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+}
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 

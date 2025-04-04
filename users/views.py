@@ -1,6 +1,9 @@
 from django.contrib.auth.models import make_password
+from artist.services import createArtist
 from core.models import CustomUser
-from .serializers import LoginSerializer, UserSerializer, ArtistSignupSerializer
+from profiles.services import createProfile
+from users.utils import create_jwt, decode_jwt, getBearerToken
+from .serializers import LoginSerializer, UserSerializer, SignUpSerializer
 from django.contrib.auth import authenticate
 from django.http import Http404
 from rest_framework.views import APIView
@@ -71,6 +74,8 @@ class UserDetail(APIView):
 
 
 class LoginView(APIView):
+    authentication_classes = []
+    permission_classes = []
     def post(self, request, format=None):
         serializer = LoginSerializer(
             data=request.data,
@@ -100,8 +105,57 @@ class LoginView(APIView):
 
 class SignupView(APIView):
     def post(self, request, format=None):
-        serializer = SignupSerializer(data=request.data)
+        serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
-            return Response(serializer.validated_data, status=status.HTTP_200_OK)
-        serializer.save()
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            data = serializer.validated_data
+            user = createUser(email=request.data["email"],password=request.data["password"],role = request.data["role"])
+            if user['role'] == 'ARTIST':
+                artist = createArtist(user["id"])
+            if user['role'] == 'ARTIST_MANAGER':
+                manager = createProfile(user['id'])
+
+            token = create_jwt(user)
+            data['token'] ={
+                    "accessToken":token["accessToken"],
+                    "refreshToken":token["refreshToken"]
+
+                    }
+            response = Response(data,status=status.HTTP_200_OK)
+            response.set_cookie(
+                "accessToken",
+                data["token"]["accessToken"],
+                samesite="lax",
+                httponly=True,
+            )
+            response.set_cookie(
+                "refreshToken",
+                data["token"]["refreshToken"],
+                samesite="lax",
+                httponly=True,
+            )
+            return response
+class RefreshTokenView(APIView):
+    def post(self, request):
+        token = getBearerToken(request)
+        if not token:
+            return Response({'error': 'Unauthorized - No Bearer token found'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        payload = decode_jwt(token)
+        if not payload:
+            return Response({'error': 'Unauthorized - Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        newToken = create_jwt(payload)
+        response = Response(newToken, status=status.HTTP_200_OK)
+        response.set_cookie(
+            "accessToken",
+            newToken["accessToken"],
+            samesite="lax",
+            httponly=True,
+        )
+        response.set_cookie(
+            "refreshToken",
+            newToken["refreshToken"],
+            samesite="lax",
+            httponly=True,
+        )
+        return response

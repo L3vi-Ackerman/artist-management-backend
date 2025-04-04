@@ -4,6 +4,7 @@ from artist import views
 
 urlpatterns = [
     path("artist/", views.ArtistList.as_view()),
+    path('artist/one/',views.ArtistSingleDetail.as_view()),
     path("artist/<int:pk>/", views.ArtistDetail.as_view()),
 ]
 

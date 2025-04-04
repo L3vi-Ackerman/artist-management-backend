@@ -43,7 +43,7 @@ class JWTAuthentication(BaseAuthentication):
     def get_user_from_payload(self, payload):
         """Fetch user from decoded JWT payload"""
         try:
-            user = User.objects.get(uuid=payload["user_id"])
+            user = User.objects.get(id=payload["id"])
         except User.DoesNotExist:
             return None
         return user
