@@ -38,7 +38,7 @@ class Profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=255,null=True)
     last_name = models.CharField(max_length=255,null=True)
-    phone = models.PositiveBigIntegerField(null=True)
+    phone = models.CharField(max_length=10,null=True)
     dob = models.DateField(null=True)
     address = models.CharField(max_length=255,null=True)
     created_at = models.DateTimeField(default=timezone.now,null=True)
