@@ -82,7 +82,7 @@ class ProfileDetail(APIView):
                 phone=phone,
                 pk=pk,
                 userId=user_id  
-            )
+           )
 
             if updated_profile_data:
                 return Response(updated_profile_data)

@@ -14,8 +14,6 @@ class UserSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, required=True)
     role = serializers.ChoiceField(choices=CustomUser.ROLES)
-    # is_superuser = serializers.BooleanField(read_only=True)
-    # is_staff = serializers.BooleanField(read_only=True)
     is_active = serializers.BooleanField(read_only=True)
 
    

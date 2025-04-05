@@ -12,5 +12,5 @@ class ProfileSerializer(serializers.Serializer):
     phone = serializers.CharField(allow_null=True,required=False)
     dob = serializers.DateField(allow_null=True, required=False)
     address = serializers.CharField(max_length=255,allow_null=True,required=False)
-    created_at = serializers.DateTimeField(default=timezone.now,read_only=True, required=False)
-    updated_at = serializers.DateTimeField(read_only=True, required=False, allow_null=True)
+    # created_at = serializers.DateTimeField(default=timezone.now,read_only=True, required=False)
+    # updated_at = serializers.DateTimeField(read_only=True, required=False, allow_null=True)
