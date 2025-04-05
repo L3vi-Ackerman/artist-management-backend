@@ -19,13 +19,6 @@ class UserSerializer(serializers.Serializer):
     is_active = serializers.BooleanField(read_only=True)
     date_joined = serializers.DateTimeField(read_only=True)
 
-    # def create(self, validated_data):
-    #     password = validated_data.pop("password")
-    #     user = CustomUser(**validated_data)
-    #     user.set_password(password)
-    #     user.save()
-    #     return user
-
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
         for attr, value in validated_data.items():
@@ -51,6 +44,12 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid credentials!")
         token = create_jwt(user)
         return {"token": token}
+
+class SignUpSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+    role = serializers.ChoiceField(choices = CustomUser.ROLES)
+
 
 class ArtistSignupSerializer(serializers.Serializer):
 

@@ -5,13 +5,16 @@ from django.http import Http404
 from core.models import Artist
 from .serializers import ArtistSerializer
 from .pagination import ArtistPagination
-from .selectors import get_paginated_artists, getArtist
+from .selectors import get_paginated_artists, getArtist, getSingleArtist
+from users.utils import decode_jwt
 from .services import createArtist, updateArtist, deleteArtist
 from users.services import createUser
 from rest_framework.permissions import IsAuthenticated
 
 class ArtistList(APIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
+    authentication_classes = []
+    permission_classes = []
     def get(self, request, format=None):
         try:
             paginator = ArtistPagination()
@@ -50,12 +53,17 @@ class ArtistDetail(APIView):
         except Artist.DoesNotExist:
             raise Http404
 
+    
     def get(self, request, pk, format=None):
+        artist = getArtist(pk = pk)
         artist = self.get_object(pk)
         serializer = ArtistSerializer(artist)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+    def put(self, request,pk, format=None):
+        token = request.headers["Authorization"].split(" ")[1]
+        payload = decode_jwt(token)
+        user_id = payload.get("id")
         user_data = request.data
         serializer = ArtistSerializer(data=user_data)
         if not serializer.is_valid():
@@ -69,13 +77,15 @@ class ArtistDetail(APIView):
         no_of_albumns_released = serializer.validated_data["no_of_albumns_released"]
 
         udpated_artist = updateArtist(
-            pk,
-            name,
-            dob,
-            gender,
-            address,
-            first_release_year,
-            no_of_albumns_released,
+            name=name,
+            dob = dob,
+            gender = gender,
+            address =address,
+            first_release_year = first_release_year,
+            no_of_albumns_released = no_of_albumns_released,
+            pk = pk,
+            userId=user_id
+
         )
 
         if not udpated_artist:
@@ -94,3 +104,16 @@ class ArtistDetail(APIView):
             )
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ArtistSingleDetail(APIView):
+    
+    def get(self,request):
+
+        token = request.headers["Authorization"].split(" ")[1]
+        payload = decode_jwt(token)
+        user_id = payload.get("id")
+        artist = getSingleArtist(user_id)
+        serializer = ArtistSerializer(artist)
+        return Response(serializer.data)
+
+

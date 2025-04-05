@@ -29,7 +29,7 @@ def get_paginated_artists(request, paginator):
     return paginator.paginate_queryset(artist_instances, request)
 
 
-def getArtist(pk: int):
+def getArtist(pk: int):  
     print(pk)
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM core_artist WHERE id = %s", (pk,))
@@ -38,4 +38,15 @@ def getArtist(pk: int):
         print(row)
         if row:
             return dict(zip(columns, row))
-        return None
+    return None
+
+def getSingleArtist(userId:int):
+    print(userId)
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM core_artist WHERE user_id = %s", (userId,))
+        columns = [col[0] for col in cursor.description]
+        row = cursor.fetchone()
+        print(row)
+        if row:
+            return dict(zip(columns, row))
+    return None

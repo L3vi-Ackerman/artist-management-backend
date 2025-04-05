@@ -5,12 +5,12 @@ from django.utils import timezone
 
 
 class ProfileSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True, required=False)
-    user = UserSerializer(allow_null=True)
-    first_name = serializers.CharField(required=True, max_length=255)
-    last_name = serializers.CharField(required=True, max_length=255)
-    phone = serializers.CharField(max_length=10)
-    dob = serializers.DateField()
-    address = serializers.CharField(max_length=255)
+    id = serializers.IntegerField(read_only=True)
+    user = UserSerializer(read_only=True)
+    first_name = serializers.CharField(required=False, max_length=255,allow_null=True)
+    last_name = serializers.CharField(required=False, max_length=255,allow_null=True)
+    phone = serializers.IntegerField(allow_null=True,required=False)
+    dob = serializers.DateField(allow_null=True, required=False)
+    address = serializers.CharField(max_length=255,allow_null=True,required=False)
     created_at = serializers.DateTimeField(default=timezone.now,read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)

@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth.hashers import check_password
 
 
-def createProfile(userId, first_name, last_name, phone, dob, address):
+def createProfile(userId:int, first_name:str="", last_name="", phone=None, dob=None, address=""):
     with connection.cursor() as cursor:
         cursor.execute(
             "INSERT INTO core_profile (user_id, first_name,last_name,phone, dob,address, created_at, updated_at) VALUES (%s,%s,%s,%s,%s,%s, %s, %s) RETURNING ID",

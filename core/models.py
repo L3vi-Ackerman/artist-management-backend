@@ -36,12 +36,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    phone = models.PositiveBigIntegerField()
-    dob = models.DateField()
-    address = models.CharField(max_length=255)
-    created_at = models.DateTimeField(default=timezone.now)
+    first_name = models.CharField(max_length=255,null=True)
+    last_name = models.CharField(max_length=255,null=True)
+    phone = models.PositiveBigIntegerField(null=True)
+    dob = models.DateField(null=True)
+    address = models.CharField(max_length=255,null=True)
+    created_at = models.DateTimeField(default=timezone.now,null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
 
@@ -51,13 +51,13 @@ class Artist(models.Model):
     manager = models.ForeignKey(
         Profile, on_delete=models.CASCADE, null=True, blank=True
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,null=True)
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    dob = models.DateField()
-    gender = models.CharField(max_length=1, default="M", choices=GENDER)
-    address = models.CharField(max_length=255)
-    first_release_year = models.DateField()
-    no_of_albumns_released = models.IntegerField()
+    dob = models.DateField(null=True)
+    gender = models.CharField(max_length=1, default="M", choices=GENDER, null=True)
+    address = models.CharField(max_length=255, null=True)
+    first_release_year = models.CharField(null=True)
+    no_of_albumns_released = models.IntegerField(null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 

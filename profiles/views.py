@@ -6,18 +6,13 @@ from core.models import Profile
 from django.shortcuts import get_object_or_404
 from users.utils import decode_jwt
 from .serializers import ProfileSerializer
-from .selectors import getProfile, getAllProfiles
+from .selectors import getProfile, getAllProfiles, getSingleProfile
 from .services import createProfile, updateProfile, deleteProfile
 from users.services import createUser
 
 class ProfileList(APIView):
     def get(self, request, format=None):
-        # print('request user id', request.user.id)
-        # profile = get_object_or_404(Profile,user = request.user)
-        # print("Request: ",request)
-        # print("Profile data: ", profile)
-        # serializer = ProfileSerializer(profile)
-        # return Response(serializer.data)
+       
         print(request)
         profile = getAllProfiles()
         serializer = ProfileSerializer(profile, many=True)
@@ -98,3 +93,16 @@ class ProfileDetail(APIView):
             )
         except Exception as e:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ProfileSingleDetail(APIView):
+    
+    def get(self,request):
+
+        token = request.headers["Authorization"].split(" ")[1]
+        payload = decode_jwt(token)
+        user_id = payload.get("id")
+        artist = getSingleProfile(user_id)
+        serializer = ProfileSerializer(artist)
+        return Response(serializer.data)
+
+

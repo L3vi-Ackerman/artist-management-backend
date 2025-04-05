@@ -17,6 +17,16 @@ def getAllProfiles():
         return profiles
 
 
+def getSingleProfile(userId:int):
+    print(userId)
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM core_profile WHERE user_id = %s", (userId,))
+        columns = [col[0] for col in cursor.description]
+        row = cursor.fetchone()
+        print(row)
+        if row:
+            return dict(zip(columns, row))
+    return None
 def getProfile(pk: int):
     print(pk)
     with connection.cursor() as cursor:
