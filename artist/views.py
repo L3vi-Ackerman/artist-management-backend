@@ -6,7 +6,7 @@ from core.models import Artist
 from .serializers import ArtistSerializer
 from .pagination import ArtistPagination
 from .selectors import get_paginated_artists, getArtist, getSingleArtist
-from users.utils import decode_jwt
+from users.utils import decode_jwt, getBearerToken
 from .services import createArtist, updateArtist, deleteArtist
 from users.services import createUser
 from rest_framework.permissions import IsAuthenticated
@@ -18,8 +18,11 @@ class ArtistList(APIView):
     def get(self, request, format=None):
         try:
             paginator = ArtistPagination()
-        
-            artists = get_paginated_artists(request, paginator)
+            token = request.headers["Authorization"].split(" ")[1]
+            payload = decode_jwt(token)
+            user_id = payload.get("id")
+           
+            artists = get_paginated_artists(request, paginator, userID=user_id)
             print(artists)
             serializer = ArtistSerializer(artists, many=True)
             return paginator.get_paginated_response(serializer.data)
