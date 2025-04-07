@@ -14,10 +14,33 @@ from .selectors import getAllMusic, getMusic
 
 class MusicList(APIView):
     def get(self, request, format=None):
-        music = getAllMusic()
-        serializer = MusicSerializer(data=music, many=True)
-        serializer.is_valid()
-        return Response(serializer.data)
+        music_data = getAllMusic()
+        serialized_data = []
+        for item in music_data:
+            artist_data = {
+                "id": item.get("artist_id"),
+                "name": item.get("artist_name"),
+                "dob": str(item.get("artist_dob")),
+                "gender": item.get("artist_gender"),
+                "address": item.get("artist_address"),
+                "first_release_year": item.get("artist_first_release_year"),
+                "no_of_albumns_released": item.get("artist_no_of_albumns_released"),
+                "created_at": item.get("artist_created_at").isoformat() + "Z" if item.get("artist_created_at") else None,
+                "updated_at": item.get("artist_updated_at").isoformat() + "Z" if item.get("artist_updated_at") else None,
+            }
+            music_item = {
+                "id": item.get("music_id"),
+                "title": item.get("title"),
+                "album_name": item.get("album_name"),
+                "genre": item.get("genre"),
+                "created_at": item.get("music_created_at").isoformat() + "Z" if item.get("music_created_at") else None,
+                "updated_at": item.get("music_updated_at").isoformat() + "Z" if item.get("music_updated_at") else None,
+                "artist": artist_data,
+            }
+            serialized_data.append(music_item)
+
+        serializer = MusicSerializer(serialized_data, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
         serializer = MusicSerializer(data=request.data)

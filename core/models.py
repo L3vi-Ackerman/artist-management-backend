@@ -70,11 +70,11 @@ class Music(models.Model):
         ("r", "rock"),
         ("j", "jazz"),
     )
-    artist_id = models.ForeignKey(
-        Artist, on_delete=models.CASCADE, db_column="artist_id"
-    )
-    title = models.CharField(max_length=255)
-    album_name = models.CharField(max_length=255)
-    genre = models.CharField(max_length=7)
-    created_at = models.DateTimeField(default=timezone.now)
+    artist = models.ForeignKey(
+        Artist, on_delete=models.CASCADE    )
+    
+    title = models.CharField(max_length=255,null=True)
+    album_name = models.CharField(max_length=255,null=True)
+    genre = models.CharField(max_length=7,null=True)
+    created_at = models.DateTimeField(default=timezone.now,null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
