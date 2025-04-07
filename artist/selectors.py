@@ -3,16 +3,18 @@ from django.db import connection
 from core.models import Artist,Profile
 
 
-def get_paginated_artists(request, paginator):
+def get_paginated_artists(request, paginator, userID:int):
+    print('user id is: ', userID)
     user_id = 52
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT * FROM core_artist
             WHERE core_artist.manager_id = (
-            SELECT id from core_customuser
-            WHERE core_customuser.id = 52
+            SELECT id from core_profile
+            WHERE core_profile.user_id = %s
     )
-                       """)
+                       """,[userID])
+        
         columns = [col[0] for col in cursor.description]
         artists_dicts = [dict(zip(columns, row)) for row in cursor.fetchall()]
 

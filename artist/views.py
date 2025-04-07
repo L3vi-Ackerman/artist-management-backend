@@ -18,11 +18,11 @@ class ArtistList(APIView):
     def get(self, request, format=None):
         try:
             paginator = ArtistPagination()
-            # token = request.headers["Authorization"].split(" ")[1]
-            # payload = decode_jwt(token)
-            # user_id = payload.get("id")
-            # print("managerId: ",user_id)
-            artists = get_paginated_artists(request, paginator)
+            token = request.headers["Authorization"].split(" ")[1]
+            payload = decode_jwt(token)
+            user_id = payload.get("id")
+           
+            artists = get_paginated_artists(request, paginator, userID=user_id)
             print(artists)
             serializer = ArtistSerializer(artists, many=True)
             return paginator.get_paginated_response(serializer.data)
