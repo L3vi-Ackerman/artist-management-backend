@@ -5,7 +5,6 @@ from core.models import Artist,Profile
 
 def get_paginated_artists(request, paginator, userID:int):
     print('user id is: ', userID)
-    user_id = 52
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT * FROM core_artist

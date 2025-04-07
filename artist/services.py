@@ -49,72 +49,64 @@ def updateArtist(
     print(f"dob: ", dob)
     print(f"gender: ", gender)
     print(f"address: ", address)
+    
     try:
-        if pk:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                        "UPDATE core_artist SET name = %s, dob = %s, gender = %s, address = %s, first_release_year = %s, no_of_albumns_released = %s, updated_at = %s WHERE id = %s RETURNING id, name, dob, gender, address, first_release_year, no_of_albumns_released",
-                        [
-                            name,
-                            dob,
-                            gender,
-                            address,
-                            first_release_year,
-                            no_of_albumns_released,
-                            timezone.now(),
-                            pk
-                            ],
-                        )
+        if not pk or not userId:
+            raise ValueError("Both artist_id (pk) and user_id must be provided.")
 
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT 1
+                FROM core_artist a
+                LEFT JOIN core_profile p ON a.manager_id = p.id
+                WHERE a.id = %s AND (
+                    a.user_id = %s OR
+                    p.user_id = %s
+                )
+            """, [pk, userId, userId])
+            permission = cursor.fetchone()
+
+        if not permission:
+            print("Unauthorized update attempt")
+            return None
+
+        # Perform update
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE core_artist 
+                SET name = %s, dob = %s, gender = %s, address = %s, 
+                    first_release_year = %s, no_of_albumns_released = %s, updated_at = %s 
+                WHERE id = %s 
+                RETURNING id, name, dob, gender, address, first_release_year, no_of_albumns_released
+            """, [
+                name,
+                dob,
+                gender,
+                address,
+                first_release_year,
+                no_of_albumns_released,
+                timezone.now(),
+                pk
+            ])
             updated_artist = cursor.fetchone()
 
-            if not updated_artist:
-                return None
+        if not updated_artist:
+            return None
 
-            return {
-                    "id": updated_artist[0],
-                    "name": updated_artist[1],
-                    "dob": updated_artist[2],
-                    "gender": updated_artist[3],
-                    "address": updated_artist[4],
-                    "first_release_year": updated_artist[5],
-                    "no_of_albumns_released": updated_artist[6],
-                    }
-        else:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                        "UPDATE core_artist SET name = %s, dob = %s, gender = %s, address = %s, first_release_year = %s, no_of_albumns_released = %s, updated_at = %s WHERE id = %s RETURNING id, name, dob, gender, address, first_release_year, no_of_albumns_released",
-                        [
-                            name,
-                            dob,
-                            gender,
-                            address,
-                            first_release_year,
-                            no_of_albumns_released,
-                            timezone.now(),
-                            userId,
-                            ],
-                        )
+        return {
+            "id": updated_artist[0],
+            "name": updated_artist[1],
+            "dob": updated_artist[2],
+            "gender": updated_artist[3],
+            "address": updated_artist[4],
+            "first_release_year": updated_artist[5],
+            "no_of_albumns_released": updated_artist[6],
+        }
 
-            updated_artist = cursor.fetchone()
-
-            if not updated_artist:
-                return None
-
-            return {
-                    "id": updated_artist[0],
-                    "name": updated_artist[1],
-                    "dob": updated_artist[2],
-                    "gender": updated_artist[3],
-                    "address": updated_artist[4],
-                    "first_release_year": updated_artist[5],
-                    "no_of_albumns_released": updated_artist[6],
-                    }
     except Exception as e:
         print(f"Error during update: {e}")
         return None
-
-
+    
 def deleteArtist(pk):
     with connection.cursor() as cursor:
         cursor.execute("DELETE FROM core_artist WHERE id = %s", [pk])
