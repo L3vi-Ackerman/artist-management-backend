@@ -13,7 +13,7 @@ def get_paginated_artists(request, paginator, userID:int):
             WHERE core_profile.user_id = %s
     )
                        """,[userID])
-        
+
         columns = [col[0] for col in cursor.description]
         artists_dicts = [dict(zip(columns, row)) for row in cursor.fetchall()]
 

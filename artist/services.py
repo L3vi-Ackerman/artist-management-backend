@@ -56,13 +56,9 @@ def updateArtist(
 
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT 1
-                FROM core_artist a
-                LEFT JOIN core_profile p ON a.manager_id = p.id
-                WHERE a.id = %s AND (
-                    a.user_id = %s OR
-                    p.user_id = %s
-                )
+              SELECT *
+FROM core_music WHERE artist_id = %s
+   OR artist_id IN (SELECT id FROM your_app_name_artist WHERE manager_id = (SELECT profile_id FROM your_app_name_artist WHERE user_id = %s));                )
             """, [pk, userId, userId])
             permission = cursor.fetchone()
 
