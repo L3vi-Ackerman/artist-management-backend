@@ -12,7 +12,7 @@ from users.services import createUser
 from rest_framework.permissions import IsAuthenticated
 
 class ArtistList(APIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     authentication_classes = []
     permission_classes = []
     def get(self, request, format=None):

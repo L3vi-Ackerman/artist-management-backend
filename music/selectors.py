@@ -29,7 +29,6 @@ def getAllMusic():
         )
         columns = [col[0] for col in cursor.description]
         music_data = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        print(music_data)
         return music_data
 def getMusic(pk: int):
     with connection.cursor() as cursor:
@@ -38,7 +37,7 @@ def getMusic(pk: int):
             SELECT 
                 core_music.id,
                 core_music.title,
-                core_music.albumn_name,
+                core_music.album_name,
                 core_music.genre,
                 core_music.created_at,
                 core_music.updated_at,

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 from core.models import Music, Artist
+from users.utils import decode_jwt, getBearerToken
 from .serializers import MusicSerializer
 from .services import (
     createMusic,
@@ -68,6 +69,11 @@ class MusicDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
+        token = getBearerToken(request)
+        print(token)
+        payload = decode_jwt(token)
+        user_id = payload.get("id")
+        print("user id: ", user_id)
         music = self.get_object(pk)
         serializer = MusicSerializer(music, data=request.data, partial=True)
         if not serializer.is_valid():
@@ -77,7 +83,7 @@ class MusicDetail(APIView):
         album_name = music_data.get("album_name", music.get("album_name"))
         genre = music_data.get("genre", music.get("genre"))
 
-        updated_music = updateMusic(pk, title=title, album_name=album_name, genre=genre)
+        updated_music = updateMusic(title=title, album_name=album_name, genre=genre, pk=pk, userId=user_id)
         if not updated_music:
             return Response(
                 {"detail": "Music not found"}, status=status.HTTP_404_NOT_FOUND
